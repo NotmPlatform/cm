@@ -80,21 +80,21 @@ HELP_TEXT = (
 # =========================
 
 LESSONS = [
-    {"number": 1, "title": "Урок 1", "text_url": "https://example.com/lesson-1-text", "video_url": "https://example.com/lesson-1-video"},
-    {"number": 2, "title": "Урок 2", "text_url": "https://example.com/lesson-2-text", "video_url": "https://example.com/lesson-2-video"},
-    {"number": 3, "title": "Урок 3", "text_url": "https://example.com/lesson-3-text", "video_url": "https://example.com/lesson-3-video"},
-    {"number": 4, "title": "Урок 4", "text_url": "https://example.com/lesson-4-text", "video_url": "https://example.com/lesson-4-video"},
-    {"number": 5, "title": "Урок 5", "text_url": "https://example.com/lesson-5-text", "video_url": "https://example.com/lesson-5-video"},
-    {"number": 6, "title": "Урок 6", "text_url": "https://example.com/lesson-6-text", "video_url": "https://example.com/lesson-6-video"},
-    {"number": 7, "title": "Урок 7", "text_url": "https://example.com/lesson-7-text", "video_url": "https://example.com/lesson-7-video"},
-    {"number": 8, "title": "Урок 8", "text_url": "https://example.com/lesson-8-text", "video_url": "https://example.com/lesson-8-video"},
-    {"number": 9, "title": "Урок 9", "text_url": "https://example.com/lesson-9-text", "video_url": "https://example.com/lesson-9-video"},
-    {"number": 10, "title": "Урок 10", "text_url": "https://example.com/lesson-10-text", "video_url": "https://example.com/lesson-10-video"},
-    {"number": 11, "title": "Урок 11", "text_url": "https://example.com/lesson-11-text", "video_url": "https://example.com/lesson-11-video"},
-    {"number": 12, "title": "Урок 12", "text_url": "https://example.com/lesson-12-text", "video_url": "https://example.com/lesson-12-video"},
-    {"number": 13, "title": "Урок 13", "text_url": "https://example.com/lesson-13-text", "video_url": "https://example.com/lesson-13-video"},
-    {"number": 14, "title": "Урок 14", "text_url": "https://example.com/lesson-14-text", "video_url": "https://example.com/lesson-14-video"},
-    {"number": 15, "title": "Урок 15", "text_url": "https://example.com/lesson-15-text", "video_url": "https://example.com/lesson-15-video"},
+    {"number": 1, "title": "Урок 1", "text_url": "https://telegra.ph/Urok-1--Pochemu-v-Web3-komyuniti-reshaet-vsyo--i-pochemu-CM-ehto-ne-moderator-a-tochka-vliyaniya-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 2, "title": "Урок 2", "text_url": "https://telegra.ph/Urok-2--Pochemu-bolshinstvo-obychnyh-komyuniti-menedzherov-provalivayutsya-v-Web3-03-18": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 3, "title": "Урок 3", "text_url": "https://telegra.ph/Urok-3--5-tipov-lyudej-v-chate-kogo-nuzhno-rastit-kogo-nelzya-zlit-a-kogo-luchshe-srazu-obezvredit-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 4, "title": "Урок 4", "text_url": "https://telegra.ph/Urok-4--Telegram-Discord-i-X-tri-polya-boya-gde-formiruetsya-doverie-k-brendu-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 5, "title": "Урок 5", "text_url": "https://telegra.ph/Urok-5--Kak-govorit-ot-lica-brenda-tak-chtoby-tebe-verili-a-ne-prosto-chitali-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 6, "title": "Урок 6", "text_url": "https://telegra.ph/Urok-6--Kak-ne-dat-odnomu-angry-user-zarazit-ves-chat-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 7, "title": "Урок 7", "text_url": "https://telegra.ph/Urok-7--CHto-dolzhen-ponimat-CM-o-produkte-chtoby-ego-ne-schitali-bespoleznym-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 8, "title": "Урок 8", "text_url": "https://telegra.ph/Urok-8--Gde-CM-dolzhen-otvechat-sam-a-gde-odno-lishnee-slovo-mozhet-navredit-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 9, "title": "Урок 9", "text_url": "https://telegra.ph/Urok-9--Kak-prevrashchat-shum-komyuniti-v-razveddannye-dlya-vsej-kompanii-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 10, "title": "Урок 10", "text_url": "https://telegra.ph/Urok-10--Pochemu-odni-chaty-zhivye-a-drugie-umirayut--i-kak-ehto-menyat-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 11, "title": "Урок 11", "text_url": "https://telegra.ph/Urok-11--AMA-kvizy-i-aktivacii-kak-zastavit-komyuniti-ne-prosto-chitat-a-uchastvovat-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 12, "title": "Урок 12", "text_url": "https://telegra.ph/Urok-12--Kak-vyrastit-vnutri-komyuniti-lyudej-kotorye-nachnut-usilivat-brend-za-vas-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 13, "title": "Урок 13", "text_url": "https://telegra.ph/Urok-13--Odin-den-iz-zhizni-Web3-CM-kak-ne-utonut-v-haose-i-ne-poteryat-kontrol-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 14, "title": "Урок 14", "text_url": "https://telegra.ph/Urok-14--Kak-otvechaet-slabyj-CM-i-kak-otvechaet-silnyj--10-realnyh-razborov-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 15, "title": "Урок 15", "text_url": "https://telegra.ph/Urok-15--Kak-poluchit-rabotu-v-Web3-esli-u-tebya-poka-net-gromkogo-opyta-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
 ]
 
 # =========================
