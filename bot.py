@@ -102,13 +102,13 @@ LESSONS = [
 # =========================
 
 BONUS_ITEMS = [
-    {"key": "negativity", "title": "Шаблоны ответов на негатив", "url": "https://example.com/bonus-negativity"},
-    {"key": "faq", "title": "Шаблон FAQ", "url": "https://example.com/bonus-faq"},
-    {"key": "weekly_report", "title": "Шаблон weekly report", "url": "https://example.com/bonus-weekly-report"},
-    {"key": "community_report", "title": "Шаблон community report", "url": "https://example.com/bonus-community-report"},
-    {"key": "chat_rules", "title": "Шаблон правил чата", "url": "https://example.com/bonus-chat-rules"},
-    {"key": "ama", "title": "Шаблон AMA", "url": "https://example.com/bonus-ama"},
-    {"key": "cv", "title": "CV template", "url": "https://example.com/bonus-cv"},
+    {"key": "negativity", "title": "Шаблоны ответов на негатив", "url": "https://telegra.ph/BONUS-1-SHABLONY-OTVETOV-NA-NEGATIV-03-18"},
+    {"key": "faq", "title": "Шаблон FAQ", "url": "https://telegra.ph/SHablon-FAQ-03-18"},
+    {"key": "weekly_report", "title": "Шаблон weekly report", "url": "https://telegra.ph/WEEKLY-REPORT-TEMPLATE-03-18"},
+    {"key": "community_report", "title": "Шаблон community report", "url": "https://telegra.ph/COMMUNITY-REPORT-TEMPLATE-03-18"},
+    {"key": "chat_rules", "title": "Шаблон правил чата", "url": "https://telegra.ph/SHABLON-PRAVIL-CHATA-03-18"},
+    {"key": "ama", "title": "Шаблон AMA", "url": "https://telegra.ph/SHABLON-AMA-03-18"},
+    {"key": "cv", "title": "CV template", "url": "https://telegra.ph/SHABLON-CV-DLYA-WEB3-COMMUNITY-MANAGER-03-18"},
     {"key": "cert_test", "title": "Тест для получения сертификата", "url": CERT_TEST_BOT_URL},
 ]
 
