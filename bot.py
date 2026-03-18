@@ -296,7 +296,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     upsert_user(user.id, user.username, user.first_name)
     state = get_user_state(user.id)
-    text = f"{WELCOME_TEXT}
+    text = f"{WELCOME_TEXT}"
 
 Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
     if update.message:
