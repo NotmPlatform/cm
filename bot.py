@@ -81,7 +81,7 @@ HELP_TEXT = (
 
 LESSONS = [
     {"number": 1, "title": "Урок 1", "text_url": "https://telegra.ph/Urok-1--Pochemu-v-Web3-komyuniti-reshaet-vsyo--i-pochemu-CM-ehto-ne-moderator-a-tochka-vliyaniya-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
-    {"number": 2, "title": "Урок 2", "text_url": "https://telegra.ph/Urok-2--Pochemu-bolshinstvo-obychnyh-komyuniti-menedzherov-provalivayutsya-v-Web3-03-18": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
+    {"number": 2, "title": "Урок 2", "text_url": "https://telegra.ph/Urok-2--Pochemu-bolshinstvo-obychnyh-komyuniti-menedzherov-provalivayutsya-v-Web3-03-18, "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
     {"number": 3, "title": "Урок 3", "text_url": "https://telegra.ph/Urok-3--5-tipov-lyudej-v-chate-kogo-nuzhno-rastit-kogo-nelzya-zlit-a-kogo-luchshe-srazu-obezvredit-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
     {"number": 4, "title": "Урок 4", "text_url": "https://telegra.ph/Urok-4--Telegram-Discord-i-X-tri-polya-boya-gde-formiruetsya-doverie-k-brendu-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
     {"number": 5, "title": "Урок 5", "text_url": "https://telegra.ph/Urok-5--Kak-govorit-ot-lica-brenda-tak-chtoby-tebe-verili-a-ne-prosto-chitali-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
