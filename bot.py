@@ -41,8 +41,7 @@ ADMIN_USER_IDS = {
 # Пример: PAID_GROUP_CHAT=-1001234567890
 PAID_GROUP_CHAT = os.getenv("PAID_GROUP_CHAT", "")
 
-# Публичные ссылки
-PAID_GROUP_URL = os.getenv("PAID_GROUP_URL", " ")
+# Ссылка на менеджера, если доступа нет
 MANAGER_URL = os.getenv("MANAGER_URL", "https://t.me/+Sr03OD8ZRxwxMDEy")
 
 # Ссылка на бота / тест для получения сертификата
@@ -273,7 +272,6 @@ def access_gate_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
             [InlineKeyboardButton("🔐 Проверить доступ", callback_data="check_paid_access")],
-            [InlineKeyboardButton("👥 Открыть платную группу", url=PAID_GROUP_URL)],
         ]
     )
 
@@ -405,7 +403,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     text = (
         f"<b>{COURSE_TITLE}</b>\n\n"
-        "Перед открытием уроков бот должен проверить, есть ли у вас доступ к платной группе курса.\n\n"
+        "Перед открытием уроков бот должен проверить, есть ли у вас доступ к курсу.\n\n"
         "Нажмите кнопку ниже."
     )
 
@@ -655,7 +653,6 @@ def build_application() -> Application:
         )
 
     logger.info("Paid group chat for access | %s", PAID_GROUP_CHAT if PAID_GROUP_CHAT else "empty")
-    logger.info("Paid group url | %s", "set" if PAID_GROUP_URL else "empty")
     logger.info("Manager url | %s", "set" if MANAGER_URL else "empty")
     logger.info("Admin stats enabled | %s", "yes" if ADMIN_USER_IDS else "no")
 
