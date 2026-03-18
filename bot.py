@@ -42,7 +42,7 @@ ADMIN_USER_IDS = {
 PAID_GROUP_CHAT = os.getenv("PAID_GROUP_CHAT", "")
 
 # Публичные ссылки
-PAID_GROUP_URL = os.getenv("PAID_GROUP_URL", "https://t.me/+hlKTlhDCTWYyNDI6")
+PAID_GROUP_URL = os.getenv("PAID_GROUP_URL", " ")
 MANAGER_URL = os.getenv("MANAGER_URL", "https://t.me/+Sr03OD8ZRxwxMDEy")
 
 # Ссылка на бота / тест для получения сертификата
