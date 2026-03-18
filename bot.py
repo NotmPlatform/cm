@@ -56,7 +56,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-COURSE_TITLE = "Платный курс: Web3 Community Manager"
+COURSE_TITLE = "Курс: Web3 Community Manager"
 
 WELCOME_TEXT = f"""Добро пожаловать в <b>{COURSE_TITLE}</b>.
 
