@@ -36,14 +36,14 @@ ADMIN_USER_IDS = {
     if x.strip().isdigit()
 }
 
-# Проверка подписки перед открытием материалов курса
-# Пример: -1001234567890
-BONUS_GROUP_CHAT = os.getenv("BONUS_GROUP_CHAT", "")
-BONUS_CHANNEL_CHAT = os.getenv("BONUS_CHANNEL_CHAT", "")
+# Ключ доступа к боту — участие в закрытой платной группе.
+# ВАЖНО: сюда нужен именно numeric chat_id группы, а не invite-link.
+# Пример: PAID_GROUP_CHAT=-1001234567890
+PAID_GROUP_CHAT = os.getenv("PAID_GROUP_CHAT", "")
 
-# Публичные ссылки для вступления
-COMMUNITY_URL = os.getenv("COMMUNITY_URL", "https://t.me/your_group")
-CHANNEL_URL = os.getenv("CHANNEL_URL", "https://t.me/your_channel")
+# Публичные ссылки
+PAID_GROUP_URL = os.getenv("PAID_GROUP_URL", "https://t.me/+hlKTlhDCTWYyNDI6")
+MANAGER_URL = os.getenv("MANAGER_URL", "https://t.me/+Sr03OD8ZRxwxMDEy")
 
 # Ссылка на бота / тест для получения сертификата
 CERT_TEST_BOT_URL = os.getenv("CERT_TEST_BOT_URL", "https://t.me/your_test_bot")
@@ -185,8 +185,7 @@ def upsert_user(user_id: int, username: Optional[str], first_name: Optional[str]
 
 def get_user_state(user_id: int) -> sqlite3.Row:
     with get_conn() as conn:
-        row = conn.execute("SELECT * FROM users WHERE user_id = ?", (user_id,)).fetchone()
-    return row
+        return conn.execute("SELECT * FROM users WHERE user_id = ?", (user_id,)).fetchone()
 
 
 def set_current_lesson(user_id: int, lesson_number: int) -> None:
@@ -270,6 +269,24 @@ def lesson_by_number(lesson_number: int) -> Optional[dict]:
     return None
 
 
+def access_gate_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("🔐 Проверить доступ", callback_data="check_paid_access")],
+            [InlineKeyboardButton("👥 Открыть платную группу", url=PAID_GROUP_URL)],
+        ]
+    )
+
+
+def denied_access_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("👤 Обратиться к менеджеру", url=MANAGER_URL)],
+            [InlineKeyboardButton("🔄 Проверить доступ ещё раз", callback_data="check_paid_access")],
+        ]
+    )
+
+
 def main_menu_keyboard(current_lesson: int, completed_lessons: int) -> InlineKeyboardMarkup:
     rows = []
 
@@ -324,29 +341,11 @@ def lesson_keyboard(lesson_number: int, is_last: bool) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(rows)
 
 
-def materials_access_keyboard() -> InlineKeyboardMarkup:
-    rows = []
-    join_row = []
-
-    if COMMUNITY_URL:
-        join_row.append(InlineKeyboardButton("👥 Вступить в группу", url=COMMUNITY_URL))
-    if CHANNEL_URL:
-        join_row.append(InlineKeyboardButton("📢 Подписаться на канал", url=CHANNEL_URL))
-
-    if join_row:
-        rows.append(join_row)
-
-    rows.append([InlineKeyboardButton("🔄 Проверить доступ", callback_data="check_materials_access")])
-    rows.append([InlineKeyboardButton("⬅️ В меню", callback_data="main_menu")])
-    return InlineKeyboardMarkup(rows)
-
-
 def materials_keyboard() -> InlineKeyboardMarkup:
     rows = []
     for item in BONUS_ITEMS:
         icon = "🎓" if item["key"] == "cert_test" else "🧰"
         rows.append([InlineKeyboardButton(f"{icon} {item['title']}", url=item["url"])])
-
     rows.append([InlineKeyboardButton("⬅️ В меню", callback_data="main_menu")])
     return InlineKeyboardMarkup(rows)
 
@@ -371,16 +370,29 @@ async def is_member_of_chat(bot, user_id: int, chat_id_raw: str) -> bool:
         return False
 
 
-async def has_materials_access(bot, user_id: int) -> bool:
-    checks = []
-    if BONUS_GROUP_CHAT:
-        checks.append(await is_member_of_chat(bot, user_id, BONUS_GROUP_CHAT))
-    if BONUS_CHANNEL_CHAT:
-        checks.append(await is_member_of_chat(bot, user_id, BONUS_CHANNEL_CHAT))
+async def has_paid_access(bot, user_id: int) -> bool:
+    return await is_member_of_chat(bot, user_id, PAID_GROUP_CHAT)
 
-    if not checks:
+
+async def show_denied_access(query) -> None:
+    text = (
+        "🔒 <b>Доступ к курсу закрыт</b>\n\n"
+        "Вы не оплатили урок.\n"
+        "Обратитесь к менеджеру канала."
+    )
+    await query.edit_message_text(
+        text=text,
+        parse_mode="HTML",
+        reply_markup=denied_access_keyboard(),
+        disable_web_page_preview=True,
+    )
+
+
+async def ensure_paid_access(query, user_id: int, context: ContextTypes.DEFAULT_TYPE) -> bool:
+    if await has_paid_access(context.bot, user_id):
         return True
-    return all(checks)
+    await show_denied_access(query)
+    return False
 
 
 # =========================================
@@ -390,20 +402,17 @@ async def has_materials_access(bot, user_id: int) -> bool:
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     upsert_user(user.id, user.username, user.first_name)
-    state = get_user_state(user.id)
 
     text = (
-        f"{WELCOME_TEXT}\n\n"
-        f"Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
+        f"<b>{COURSE_TITLE}</b>\n\n"
+        "Перед открытием уроков бот должен проверить, есть ли у вас доступ к платной группе курса.\n\n"
+        "Нажмите кнопку ниже."
     )
 
     if update.message:
         await update.message.reply_html(
             text,
-            reply_markup=main_menu_keyboard(
-                current_lesson=state["current_lesson"],
-                completed_lessons=state["completed_lessons"],
-            ),
+            reply_markup=access_gate_keyboard(),
             disable_web_page_preview=True,
         )
 
@@ -496,39 +505,28 @@ async def show_materials_gate(query, user_id: int, context: ContextTypes.DEFAULT
         await query.answer("Сначала пройди все 15 уроков.", show_alert=True)
         return
 
-    allowed = await has_materials_access(context.bot, user_id)
+    if not await has_paid_access(context.bot, user_id):
+        await show_denied_access(query)
+        return
 
-    if allowed:
-        unlock_materials(user_id)
-        text = (
-            "📂 <b>Материалы курса открыты</b>\n\n"
-            "Ты завершил обучение и открыл практический блок курса.\n\n"
-            "Ниже тебя ждут:\n"
-            "🧰 рабочие шаблоны и материалы\n"
-            "📑 готовые заготовки для практики\n"
-            "🎓 тест для получения сертификата\n\n"
-            "После успешного прохождения теста тебе будут доступны:\n"
-            "🛡 <b>Proof of Competency</b> — подтверждение в базе курса для HR\n"
-            "✅ <b>Verified Certificate of Completion</b> — именной PDF-сертификат"
-        )
-        await query.edit_message_text(
-            text=text,
-            parse_mode="HTML",
-            reply_markup=materials_keyboard(),
-            disable_web_page_preview=True,
-        )
-    else:
-        text = (
-            "🔒 <b>Материалы курса пока недоступны</b>\n\n"
-            "Чтобы открыть практические материалы и тест для получения сертификата, вступи в группу и подпишись на канал.\n"
-            "После этого нажми «Проверить доступ»."
-        )
-        await query.edit_message_text(
-            text=text,
-            parse_mode="HTML",
-            reply_markup=materials_access_keyboard(),
-            disable_web_page_preview=True,
-        )
+    unlock_materials(user_id)
+    text = (
+        "📂 <b>Материалы курса открыты</b>\n\n"
+        "Ты завершил обучение и открыл практический блок курса.\n\n"
+        "Ниже тебя ждут:\n"
+        "🧰 рабочие шаблоны и материалы\n"
+        "📑 готовые заготовки для практики\n"
+        "🎓 тест для получения сертификата\n\n"
+        "После успешного прохождения теста тебе будут доступны:\n"
+        "🛡 <b>Proof of Competency</b> — подтверждение в базе курса для HR\n"
+        "✅ <b>Verified Certificate of Completion</b> — именной PDF-сертификат"
+    )
+    await query.edit_message_text(
+        text=text,
+        parse_mode="HTML",
+        reply_markup=materials_keyboard(),
+        disable_web_page_preview=True,
+    )
 
 
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -538,6 +536,22 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     await query.answer()
     data = query.data
+
+    if data == "check_paid_access":
+        if not await ensure_paid_access(query, user.id, context):
+            return
+
+        state = get_user_state(user.id)
+        if state["completed_lessons"] == 0:
+            await show_lesson(query, user.id, 1)
+        else:
+            await show_main_menu(query, user.id)
+        return
+
+    guarded = {"main_menu", "all_lessons", "check_materials_access"}
+    if data in guarded or data.startswith(("lesson:", "complete:")):
+        if not await ensure_paid_access(query, user.id, context):
+            return
 
     if data == "main_menu":
         await show_main_menu(query, user.id)
@@ -601,19 +615,26 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 async def menu_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     upsert_user(user.id, user.username, user.first_name)
-    state = get_user_state(user.id)
 
     if update.message:
-        await update.message.reply_html(
-            (
-                "Используй кнопки ниже для навигации по курсу.\n\n"
-                f"Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
-            ),
-            reply_markup=main_menu_keyboard(
-                current_lesson=state["current_lesson"],
-                completed_lessons=state["completed_lessons"],
-            ),
-        )
+        if await has_paid_access(context.bot, user.id):
+            state = get_user_state(user.id)
+            await update.message.reply_html(
+                (
+                    "Используй кнопки ниже для навигации по курсу.\n\n"
+                    f"Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
+                ),
+                reply_markup=main_menu_keyboard(
+                    current_lesson=state["current_lesson"],
+                    completed_lessons=state["completed_lessons"],
+                ),
+            )
+        else:
+            await update.message.reply_html(
+                "🔒 <b>Доступ к курсу закрыт</b>\n\nВы не оплатили урок.\nОбратитесь к менеджеру канала.",
+                reply_markup=denied_access_keyboard(),
+                disable_web_page_preview=True,
+            )
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -633,10 +654,9 @@ def build_application() -> Application:
             "set" if lesson["video_url"] else "empty",
         )
 
-    logger.info("Community URL | %s", "set" if COMMUNITY_URL else "empty")
-    logger.info("Channel URL | %s", "set" if CHANNEL_URL else "empty")
-    logger.info("Bonus group chat for check | %s", BONUS_GROUP_CHAT if BONUS_GROUP_CHAT else "empty")
-    logger.info("Bonus channel chat for check | %s", BONUS_CHANNEL_CHAT if BONUS_CHANNEL_CHAT else "empty")
+    logger.info("Paid group chat for access | %s", PAID_GROUP_CHAT if PAID_GROUP_CHAT else "empty")
+    logger.info("Paid group url | %s", "set" if PAID_GROUP_URL else "empty")
+    logger.info("Manager url | %s", "set" if MANAGER_URL else "empty")
     logger.info("Admin stats enabled | %s", "yes" if ADMIN_USER_IDS else "no")
 
     application = ApplicationBuilder().token(BOT_TOKEN).build()
