@@ -16,38 +16,23 @@ from telegram.ext import (
     filters,
 )
 
-# =========================
-# НАСТРОЙКИ
-# =========================
-
 BOT_TOKEN = os.getenv("BOT_TOKEN", "PASTE_BOT_TOKEN_HERE")
-
-# Webhook (если пусто — бот запустится на polling)
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")
 WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "webhook")
 WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
 PORT = int(os.getenv("PORT", "8080"))
 
-# ID админов для команды /stats
-# Формат в .env: ADMIN_USER_IDS=12345,67890
 ADMIN_USER_IDS = {
     int(x.strip())
     for x in os.getenv("ADMIN_USER_IDS", "").split(",")
     if x.strip().isdigit()
 }
 
-# Проверка подписки на группу и канал перед выдачей бонусов
-# Укажите chat_id канала/группы, например: -1001234567890
 BONUS_GROUP_CHAT = os.getenv("BONUS_GROUP_CHAT", "")
 BONUS_CHANNEL_CHAT = os.getenv("BONUS_CHANNEL_CHAT", "")
-
-# Ссылки для вступления
 COMMUNITY_URL = os.getenv("COMMUNITY_URL", "https://t.me/your_group")
 CHANNEL_URL = os.getenv("CHANNEL_URL", "https://t.me/your_channel")
-
-# Ссылка на бота с тестом для получения сертификата
 CERT_TEST_BOT_URL = os.getenv("CERT_TEST_BOT_URL", "https://t.me/your_test_bot")
-
 DB_PATH = os.getenv("DB_PATH", "web3_cm_paid_course.db")
 
 logging.basicConfig(
@@ -56,28 +41,46 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-COURSE_TITLE = "Курс: Web3 Community Manager"
+COURSE_TITLE = "Платный курс: Web3 Community Manager"
 
 WELCOME_TEXT = (
-    f"Добро пожаловать в <b>{COURSE_TITLE}</b>.\n\n"
-    "Внутри тебя ждут 15 уроков:\n"
-    "• текстовые материалы\n"
-    "• видеоуроки\n"
-    "• бонусные шаблоны и материалы\n\n"
-    "Проходи уроки по порядку. После завершения откроются бонусы."
+    f"Добро пожаловать в <b>{COURSE_TITLE}</b>.
+
+"
+    "Ты внутри практического курса, который поможет освоить профессию "
+    "<b>Web3 Community Manager</b> и собрать сильную базу для входа в индустрию.
+
+"
+    "Что ты получишь внутри:
+
+"
+    "📘 <b>15 текстовых уроков</b> — структура, логика роли, реальные задачи и понимание профессии
+"
+    "🎬 <b>15 видеоуроков</b> — быстрый и удобный формат для прохождения материала
+"
+    "🧰 <b>Практические материалы</b> — шаблоны, инструменты и готовые заготовки для работы
+
+"
+    "После прохождения курса тебе также будут доступны:
+
+"
+    "🛡 <b>Proof of Competency</b> — подтверждение в базе курса для HR
+"
+    "✅ <b>Verified Certificate of Completion</b> — именной PDF-сертификат о прохождении курса
+
+"
+    "Проходи уроки шаг за шагом. В конце тебя ждут практические материалы и финальный тест для получения сертификата."
 )
 
 HELP_TEXT = (
-    "Команды:\n"
-    "/start — открыть курс\n"
-    "/help — помощь\n"
-    "/stats — статистика (только для администратора)"
+    "Команды:
+"
+    "/start — открыть курс
+"
+    "/help — помощь
+"
+    "/stats — статистика (для администратора)"
 )
-
-# =========================
-# УРОКИ КУРСА
-# Заполни text_url и video_url своими ссылками
-# =========================
 
 LESSONS = [
     {"number": 1, "title": "Урок 1", "text_url": "https://telegra.ph/Urok-1--Pochemu-v-Web3-komyuniti-reshaet-vsyo--i-pochemu-CM-ehto-ne-moderator-a-tochka-vliyaniya-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
@@ -96,11 +99,6 @@ LESSONS = [
     {"number": 14, "title": "Урок 14", "text_url": "https://telegra.ph/Urok-14--Kak-otvechaet-slabyj-CM-i-kak-otvechaet-silnyj--10-realnyh-razborov-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
     {"number": 15, "title": "Урок 15", "text_url": "https://telegra.ph/Urok-15--Kak-poluchit-rabotu-v-Web3-esli-u-tebya-poka-net-gromkogo-opyta-03-18", "video_url": "https://rutube.ru/video/a09d052994202df2f70ac0a0b34dc4c5/?r=wd"},
 ]
-
-# =========================
-# БОНУСЫ
-# =========================
-
 BONUS_ITEMS = [
     {"key": "negativity", "title": "Шаблоны ответов на негатив", "url": "https://telegra.ph/BONUS-1-SHABLONY-OTVETOV-NA-NEGATIV-03-18"},
     {"key": "faq", "title": "Шаблон FAQ", "url": "https://telegra.ph/SHablon-FAQ-03-18"},
@@ -111,10 +109,6 @@ BONUS_ITEMS = [
     {"key": "cv", "title": "CV template", "url": "https://telegra.ph/SHABLON-CV-DLYA-WEB3-COMMUNITY-MANAGER-03-18"},
     {"key": "cert_test", "title": "Тест для получения сертификата", "url": CERT_TEST_BOT_URL},
 ]
-
-# =========================
-# БАЗА
-# =========================
 
 def get_conn() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
@@ -155,8 +149,7 @@ def init_db() -> None:
 def upsert_user(user_id: int, username: Optional[str], first_name: Optional[str]) -> None:
     now = datetime.utcnow().isoformat()
     with get_conn() as conn:
-        cur = conn.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,))
-        row = cur.fetchone()
+        row = conn.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,)).fetchone()
         if row:
             conn.execute(
                 """
@@ -179,11 +172,7 @@ def upsert_user(user_id: int, username: Optional[str], first_name: Optional[str]
 
 def get_user_state(user_id: int) -> sqlite3.Row:
     with get_conn() as conn:
-        row = conn.execute(
-            "SELECT * FROM users WHERE user_id = ?",
-            (user_id,),
-        ).fetchone()
-    return row
+        return conn.execute("SELECT * FROM users WHERE user_id = ?", (user_id,)).fetchone()
 
 
 def set_current_lesson(user_id: int, lesson_number: int) -> None:
@@ -198,30 +187,17 @@ def set_current_lesson(user_id: int, lesson_number: int) -> None:
 def complete_lesson(user_id: int, lesson_number: int) -> None:
     now = datetime.utcnow().isoformat()
     with get_conn() as conn:
-        row = conn.execute(
-            "SELECT completed_lessons FROM users WHERE user_id = ?",
-            (user_id,),
-        ).fetchone()
+        row = conn.execute("SELECT completed_lessons FROM users WHERE user_id = ?", (user_id,)).fetchone()
         completed_lessons = row["completed_lessons"] if row else 0
         if lesson_number > completed_lessons:
             conn.execute(
-                """
-                UPDATE users
-                SET completed_lessons = ?, current_lesson = ?, last_seen_at = ?
-                WHERE user_id = ?
-                """,
+                "UPDATE users SET completed_lessons = ?, current_lesson = ?, last_seen_at = ? WHERE user_id = ?",
                 (lesson_number, min(lesson_number + 1, len(LESSONS)), now, user_id),
             )
         else:
-            conn.execute(
-                "UPDATE users SET last_seen_at = ? WHERE user_id = ?",
-                (now, user_id),
-            )
+            conn.execute("UPDATE users SET last_seen_at = ? WHERE user_id = ?", (now, user_id))
         conn.execute(
-            """
-            INSERT INTO lesson_events (user_id, lesson_number, event_type, created_at)
-            VALUES (?, ?, ?, ?)
-            """,
+            "INSERT INTO lesson_events (user_id, lesson_number, event_type, created_at) VALUES (?, ?, ?, ?)",
             (user_id, lesson_number, "complete", now),
         )
         conn.commit()
@@ -239,23 +215,10 @@ def unlock_bonuses(user_id: int) -> None:
 def get_stats() -> dict:
     with get_conn() as conn:
         users_total = conn.execute("SELECT COUNT(*) AS c FROM users").fetchone()["c"]
-        finished_total = conn.execute(
-            "SELECT COUNT(*) AS c FROM users WHERE completed_lessons >= ?",
-            (len(LESSONS),),
-        ).fetchone()["c"]
-        bonuses_total = conn.execute(
-            "SELECT COUNT(*) AS c FROM users WHERE bonuses_unlocked = 1"
-        ).fetchone()["c"]
-    return {
-        "users_total": users_total,
-        "finished_total": finished_total,
-        "bonuses_total": bonuses_total,
-    }
+        finished_total = conn.execute("SELECT COUNT(*) AS c FROM users WHERE completed_lessons >= ?", (len(LESSONS),)).fetchone()["c"]
+        materials_total = conn.execute("SELECT COUNT(*) AS c FROM users WHERE bonuses_unlocked = 1").fetchone()["c"]
+    return {"users_total": users_total, "finished_total": finished_total, "materials_total": materials_total}
 
-
-# =========================
-# ВСПОМОГАТЕЛЬНОЕ
-# =========================
 
 def lesson_by_number(lesson_number: int) -> Optional[dict]:
     for lesson in LESSONS:
@@ -266,17 +229,11 @@ def lesson_by_number(lesson_number: int) -> Optional[dict]:
 
 def main_menu_keyboard(current_lesson: int, completed_lessons: int) -> InlineKeyboardMarkup:
     rows = []
-
     if current_lesson <= len(LESSONS):
-        rows.append(
-            [InlineKeyboardButton(f"▶️ Продолжить с урока {current_lesson}", callback_data=f"lesson:{current_lesson}")]
-        )
-
+        rows.append([InlineKeyboardButton(f"▶️ Продолжить с урока {current_lesson}", callback_data=f"lesson:{current_lesson}")])
     rows.append([InlineKeyboardButton("📚 Все уроки", callback_data="all_lessons")])
-
     if completed_lessons >= len(LESSONS):
-        rows.append([InlineKeyboardButton("🎁 Получить бонусы", callback_data="check_bonus_access")])
-
+        rows.append([InlineKeyboardButton("📂 Открыть материалы курса", callback_data="check_bonus_access")])
     return InlineKeyboardMarkup(rows)
 
 
@@ -285,7 +242,7 @@ def lessons_keyboard(unlocked_to: int) -> InlineKeyboardMarkup:
     for lesson in LESSONS:
         num = lesson["number"]
         title = lesson["title"]
-        if num <= max(unlocked_to, 1):
+        if num <= unlocked_to:
             rows.append([InlineKeyboardButton(f"{num}. {title}", callback_data=f"lesson:{num}")])
         else:
             rows.append([InlineKeyboardButton(f"🔒 {num}. {title}", callback_data="locked")])
@@ -293,17 +250,14 @@ def lessons_keyboard(unlocked_to: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(rows)
 
 
-def lesson_keyboard(lesson_number: int, has_text: bool, has_video: bool, is_last: bool) -> InlineKeyboardMarkup:
-    rows = []
+def lesson_keyboard(lesson_number: int, is_last: bool) -> InlineKeyboardMarkup:
     lesson = lesson_by_number(lesson_number)
-
-    if has_text:
+    rows = []
+    if lesson and lesson.get("text_url"):
         rows.append([InlineKeyboardButton("📖 Открыть текст", url=lesson["text_url"])])
-    if has_video:
+    if lesson and lesson.get("video_url"):
         rows.append([InlineKeyboardButton("🎬 Открыть видео", url=lesson["video_url"])])
-
     rows.append([InlineKeyboardButton("✅ Отметить урок пройденным", callback_data=f"complete:{lesson_number}")])
-
     nav_row = []
     if lesson_number > 1:
         nav_row.append(InlineKeyboardButton("⬅️ Назад", callback_data=f"lesson:{lesson_number - 1}"))
@@ -311,14 +265,12 @@ def lesson_keyboard(lesson_number: int, has_text: bool, has_video: bool, is_last
         nav_row.append(InlineKeyboardButton("➡️ Далее", callback_data=f"lesson:{lesson_number + 1}"))
     if nav_row:
         rows.append(nav_row)
-
     rows.append([InlineKeyboardButton("📚 Ко всем урокам", callback_data="all_lessons")])
     rows.append([InlineKeyboardButton("⬅️ В меню", callback_data="main_menu")])
-
     return InlineKeyboardMarkup(rows)
 
 
-def bonus_access_keyboard() -> InlineKeyboardMarkup:
+def materials_access_keyboard() -> InlineKeyboardMarkup:
     rows = []
     join_row = []
     if COMMUNITY_URL:
@@ -327,16 +279,16 @@ def bonus_access_keyboard() -> InlineKeyboardMarkup:
         join_row.append(InlineKeyboardButton("📢 Подписаться на канал", url=CHANNEL_URL))
     if join_row:
         rows.append(join_row)
-
     rows.append([InlineKeyboardButton("🔄 Проверить доступ", callback_data="check_bonus_access")])
     rows.append([InlineKeyboardButton("⬅️ В меню", callback_data="main_menu")])
     return InlineKeyboardMarkup(rows)
 
 
-def bonus_keyboard() -> InlineKeyboardMarkup:
+def materials_keyboard() -> InlineKeyboardMarkup:
     rows = []
     for item in BONUS_ITEMS:
-        rows.append([InlineKeyboardButton(f"🎁 {item['title']}", url=item["url"])])
+        icon = "🎓" if item["key"] == "certificate_test" else "🧰"
+        rows.append([InlineKeyboardButton(f"{icon} {item['title']}", url=item["url"])])
     rows.append([InlineKeyboardButton("⬅️ В меню", callback_data="main_menu")])
     return InlineKeyboardMarkup(rows)
 
@@ -346,11 +298,7 @@ async def is_member_of_chat(bot, user_id: int, chat_id_raw: str) -> bool:
         return False
     try:
         member = await bot.get_chat_member(chat_id=int(chat_id_raw), user_id=user_id)
-        return member.status in {
-            ChatMemberStatus.MEMBER,
-            ChatMemberStatus.ADMINISTRATOR,
-            ChatMemberStatus.OWNER,
-        }
+        return member.status in {ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER}
     except Exception as exc:
         logger.warning("Membership check failed | chat=%s | user=%s | error=%s", chat_id_raw, user_id, exc)
         return False
@@ -362,33 +310,22 @@ async def has_bonus_access(bot, user_id: int) -> bool:
         checks.append(await is_member_of_chat(bot, user_id, BONUS_GROUP_CHAT))
     if BONUS_CHANNEL_CHAT:
         checks.append(await is_member_of_chat(bot, user_id, BONUS_CHANNEL_CHAT))
-
     if not checks:
         return True
     return all(checks)
 
 
-# =========================
-# ХЕНДЛЕРЫ
-# =========================
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     upsert_user(user.id, user.username, user.first_name)
     state = get_user_state(user.id)
+    text = f"{WELCOME_TEXT}
 
-    text = (
-        f"{WELCOME_TEXT}\n\n"
-        f"Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
-    )
-
+Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
     if update.message:
         await update.message.reply_html(
             text,
-            reply_markup=main_menu_keyboard(
-                current_lesson=state["current_lesson"],
-                completed_lessons=state["completed_lessons"],
-            ),
+            reply_markup=main_menu_keyboard(state["current_lesson"], state["completed_lessons"]),
             disable_web_page_preview=True,
         )
 
@@ -404,13 +341,16 @@ async def stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         if update.message:
             await update.message.reply_text("У тебя нет доступа к этой команде.")
         return
-
     stats = get_stats()
     text = (
-        "📊 Статистика бота\n\n"
-        f"Пользователей: {stats['users_total']}\n"
-        f"Завершили все 15 уроков: {stats['finished_total']}\n"
-        f"Открыли бонусы: {stats['bonuses_total']}"
+        "📊 Статистика бота
+
+"
+        f"Пользователей: {stats['users_total']}
+"
+        f"Завершили все уроки: {stats['finished_total']}
+"
+        f"Открыли материалы курса: {stats['materials_total']}"
     )
     if update.message:
         await update.message.reply_text(text)
@@ -418,17 +358,13 @@ async def stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 async def show_main_menu(query, user_id: int) -> None:
     state = get_user_state(user_id)
-    text = (
-        f"{WELCOME_TEXT}\n\n"
-        f"Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
-    )
+    text = f"{WELCOME_TEXT}
+
+Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
     await query.edit_message_text(
         text=text,
         parse_mode="HTML",
-        reply_markup=main_menu_keyboard(
-            current_lesson=state["current_lesson"],
-            completed_lessons=state["completed_lessons"],
-        ),
+        reply_markup=main_menu_keyboard(state["current_lesson"], state["completed_lessons"]),
         disable_web_page_preview=True,
     )
 
@@ -436,10 +372,9 @@ async def show_main_menu(query, user_id: int) -> None:
 async def show_all_lessons(query, user_id: int) -> None:
     state = get_user_state(user_id)
     unlocked_to = min(max(state["completed_lessons"] + 1, 1), len(LESSONS))
-    text = (
-        "📚 <b>Все уроки курса</b>\n\n"
-        "Открывай уроки по порядку. После завершения всех 15 уроков откроются бонусы."
-    )
+    text = "📚 <b>Все уроки курса</b>
+
+Открывай уроки по порядку. После завершения 15 уроков откроются практические материалы и финальный тест."
     await query.edit_message_text(
         text=text,
         parse_mode="HTML",
@@ -453,31 +388,20 @@ async def show_lesson(query, user_id: int, lesson_number: int) -> None:
     if not lesson:
         await query.answer("Урок не найден.", show_alert=True)
         return
-
     state = get_user_state(user_id)
     unlocked_to = min(max(state["completed_lessons"] + 1, 1), len(LESSONS))
     if lesson_number > unlocked_to:
         await query.answer("Сначала пройди предыдущий урок.", show_alert=True)
         return
-
     set_current_lesson(user_id, lesson_number)
+    text = f"📘 <b>{lesson['title']}</b>
+Урок {lesson_number} из {len(LESSONS)}
 
-    has_text = bool(lesson["text_url"])
-    has_video = bool(lesson["video_url"])
-    text = (
-        f"📘 <b>{lesson['title']}</b>\n"
-        f"Урок {lesson_number} из {len(LESSONS)}\n\n"
-        "Открой текст и видео, а затем отметь урок как пройденный."
-    )
+Открой текст и видео, а затем отметь урок как пройденный."
     await query.edit_message_text(
         text=text,
         parse_mode="HTML",
-        reply_markup=lesson_keyboard(
-            lesson_number=lesson_number,
-            has_text=has_text,
-            has_video=has_video,
-            is_last=(lesson_number == len(LESSONS)),
-        ),
+        reply_markup=lesson_keyboard(lesson_number, is_last=(lesson_number == len(LESSONS))),
         disable_web_page_preview=True,
     )
 
@@ -487,30 +411,50 @@ async def show_bonus_gate(query, user_id: int, context: ContextTypes.DEFAULT_TYP
     if state["completed_lessons"] < len(LESSONS):
         await query.answer("Сначала пройди все 15 уроков.", show_alert=True)
         return
-
     allowed = await has_bonus_access(context.bot, user_id)
     if allowed:
         unlock_bonuses(user_id)
         text = (
-            "🎁 <b>Бонусы открыты</b>\n\n"
-            "Спасибо за прохождение курса. Ниже — все бонусные материалы и тест на сертификат."
+            "📂 <b>Материалы курса открыты</b>
+
+"
+            "Ты завершил обучение и открыл практический блок курса.
+
+"
+            "Ниже тебя ждут:
+"
+            "🧰 рабочие шаблоны и материалы
+"
+            "📑 готовые заготовки для практики
+"
+            "🎓 финальный тест для получения сертификата
+
+"
+            "После успешного прохождения теста тебе будут доступны:
+"
+            "🛡 <b>Proof of Competency</b> — подтверждение в базе курса для HR
+"
+            "✅ <b>Verified Certificate of Completion</b> — именной PDF-сертификат"
         )
         await query.edit_message_text(
             text=text,
             parse_mode="HTML",
-            reply_markup=bonus_keyboard(),
+            reply_markup=materials_keyboard(),
             disable_web_page_preview=True,
         )
     else:
         text = (
-            "🔒 <b>Бонусы пока недоступны</b>\n\n"
-            "Чтобы открыть бонусы, вступи в группу и подпишись на канал.\n"
+            "🔒 <b>Материалы курса пока недоступны</b>
+
+"
+            "Чтобы открыть практические материалы и финальный тест, вступи в группу и подпишись на канал.
+"
             "После этого нажми «Проверить доступ»."
         )
         await query.edit_message_text(
             text=text,
             parse_mode="HTML",
-            reply_markup=bonus_access_keyboard(),
+            reply_markup=materials_access_keyboard(),
             disable_web_page_preview=True,
         )
 
@@ -519,89 +463,78 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     query = update.callback_query
     user = update.effective_user
     upsert_user(user.id, user.username, user.first_name)
-
     await query.answer()
     data = query.data
-
     if data == "main_menu":
         await show_main_menu(query, user.id)
         return
-
     if data == "all_lessons":
         await show_all_lessons(query, user.id)
         return
-
     if data == "locked":
         await query.answer("Сначала пройди предыдущие уроки.", show_alert=True)
         return
-
     if data == "check_bonus_access":
         await show_bonus_gate(query, user.id, context)
         return
-
     if data.startswith("lesson:"):
-        lesson_number = int(data.split(":")[1])
-        await show_lesson(query, user.id, lesson_number)
+        await show_lesson(query, user.id, int(data.split(":")[1]))
         return
-
     if data.startswith("complete:"):
         lesson_number = int(data.split(":")[1])
         complete_lesson(user.id, lesson_number)
-
         if lesson_number >= len(LESSONS):
             text = (
-                "🏁 <b>Ты завершил все 15 уроков курса.</b>\n\n"
-                "Теперь можно открыть бонусы. Перед этим бот проверит вступление в группу и канал."
+                "🏁 <b>Курс завершён</b>
+
+"
+                "Ты прошёл все 15 уроков и собрал полную базу по роли <b>Web3 Community Manager</b>.
+
+"
+                "Дальше для тебя открываются:
+"
+                "📂 практические материалы для работы
+"
+                "🧰 готовые шаблоны и рабочие заготовки
+"
+                "🎓 финальный тест для получения сертификата
+
+"
+                "Нажми ниже, чтобы открыть материалы и перейти к завершающему этапу курса."
             )
-            keyboard = InlineKeyboardMarkup(
-                [
-                    [InlineKeyboardButton("🎁 Открыть бонусы", callback_data="check_bonus_access")],
-                    [InlineKeyboardButton("⬅️ В меню", callback_data="main_menu")],
-                ]
-            )
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("📂 Открыть материалы курса", callback_data="check_bonus_access")],
+                [InlineKeyboardButton("⬅️ В меню", callback_data="main_menu")],
+            ])
             await query.edit_message_text(text=text, parse_mode="HTML", reply_markup=keyboard)
             return
-
         next_lesson = lesson_number + 1
-        text = (
-            f"✅ <b>Урок {lesson_number} отмечен как пройденный.</b>\n\n"
-            f"Готов перейти к уроку {next_lesson}?"
-        )
-        keyboard = InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton(f"➡️ Перейти к уроку {next_lesson}", callback_data=f"lesson:{next_lesson}")],
-                [InlineKeyboardButton("📚 Ко всем урокам", callback_data="all_lessons")],
-            ]
-        )
+        text = f"✅ <b>Урок {lesson_number} отмечен как пройденный.</b>
+
+Готов перейти к уроку {next_lesson}?"
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(f"➡️ Перейти к уроку {next_lesson}", callback_data=f"lesson:{next_lesson}")],
+            [InlineKeyboardButton("📚 Ко всем урокам", callback_data="all_lessons")],
+        ])
         await query.edit_message_text(text=text, parse_mode="HTML", reply_markup=keyboard)
-        return
 
 
 async def menu_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     upsert_user(user.id, user.username, user.first_name)
     state = get_user_state(user.id)
-
     if update.message:
         await update.message.reply_html(
-            (
-                "Используй кнопки ниже для навигации по курсу.\n\n"
-                f"Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков."
-            ),
-            reply_markup=main_menu_keyboard(
-                current_lesson=state["current_lesson"],
-                completed_lessons=state["completed_lessons"],
-            ),
+            f"Используй кнопки ниже для навигации по курсу.
+
+Твой прогресс: <b>{state['completed_lessons']}</b> из <b>{len(LESSONS)}</b> уроков.",
+            reply_markup=main_menu_keyboard(state["current_lesson"], state["completed_lessons"]),
         )
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.exception("Unhandled error: %s", context.error)
 
-
-# =========================
-# ИНИЦИАЛИЗАЦИЯ
-# =========================
 
 def build_application() -> Application:
     for lesson in LESSONS:
@@ -611,13 +544,11 @@ def build_application() -> Application:
             "set" if lesson["text_url"] else "empty",
             "set" if lesson["video_url"] else "empty",
         )
-
     logger.info("Community URL | %s", "set" if COMMUNITY_URL else "empty")
     logger.info("Channel URL | %s", "set" if CHANNEL_URL else "empty")
     logger.info("Bonus group chat for check | %s", BONUS_GROUP_CHAT if BONUS_GROUP_CHAT else "empty")
     logger.info("Bonus channel chat for check | %s", BONUS_CHANNEL_CHAT if BONUS_CHANNEL_CHAT else "empty")
     logger.info("Admin stats enabled | %s", "yes" if ADMIN_USER_IDS else "no")
-
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_handler))
@@ -636,7 +567,6 @@ def main() -> None:
     init_db()
     app = build_application()
     app.post_init = post_init
-
     if WEBHOOK_URL:
         webhook_path = f"/{WEBHOOK_PATH}"
         logger.info("Starting bot with webhook on %s%s", WEBHOOK_URL, webhook_path)
@@ -651,10 +581,7 @@ def main() -> None:
         )
     else:
         logger.info("Starting bot with polling")
-        app.run_polling(
-            allowed_updates=["message", "callback_query"],
-            drop_pending_updates=True,
-        )
+        app.run_polling(allowed_updates=["message", "callback_query"], drop_pending_updates=True)
 
 
 if __name__ == "__main__":
